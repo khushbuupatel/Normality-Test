@@ -21,6 +21,7 @@ Body Measurement dataset includes 12 body girth measurements and 9 skeletal meas
 library(readxl)
 library(ggpubr)
 library(ggplot2)
+library(dplyr)
 ```
 
 ## Importing the Body Measurements Dataset
@@ -70,13 +71,9 @@ Thus, assuming Bitochanteric Diameter is normally distributed is a plausible hyp
 From the above insights we choose Bitochanteric Diameter as the variable of interest.
 We calculate descriptive statistics (i.e., mean, median, standard deviation, first and third quartile, interquartile range, minimum and maximum values) for Bitochanteric diameter seperately for Men and Women.
 ```{r}
-summary_statistics <- data.frame("Statistics" = c("Mean", "SD", "Median", "Min", "Max", "First Quartile", "Third Quartile", "IQR"),
-  "Female" = c(round( mean(female_bitdi), 2), round( sd(female_bitdi), 2), round( median(female_bitdi), 2),round( min(female_bitdi), 2), round( max(female_bitdi), 2), round( quantile(female_bitdi, c(.25)), 2),round( quantile(female_bitdi, c(.75)), 2),round( IQR(female_bitdi), 2)),
-  "Male" = c(round( mean(male_bitdi), 2), round( sd(male_bitdi), 2), round( median(male_bitdi), 2),round( min(male_bitdi), 2), round( max(male_bitdi), 2), round( quantile(male_bitdi, c(.25)), 2),round( quantile(male_bitdi, c(.75)), 2), round( IQR(male_bitdi), 2)))
-
-print(summary_statistics)
+# use summarise() function from 'dplyr' to display the summary statistics grouped by 'sex'
+bdims_csv %>% group_by(sex) %>% summarise(Min = min(bit.di), Q1 = quantile(bit.di,probs = .25), Median = median(bit.di), Q3 = quantile(bit.di,probs = .75), Max = max(bit.di), Mean = mean(bit.di), SD = sd(bit.di), IQR = IQR(bit.di))
 ```
-
 
 We know that for a perfectly normally distributed data both the mean and median are same. But from the above statistics we can see that for female bit.di Mean is slightly less than Median (~0.04) which indicates that the data is almost normally distributed and for male bit.di Mean is slightly greater than Median (~0.07) which also states that the data is nearly normally distributed.
 
@@ -90,7 +87,6 @@ fig1 <- hist(female_bitdi, freq=F, breaks=20, col="lightpink", xlab = "Bitochant
 fig1 <- lines(normal_var, dnorm(normal_var, mean(female_bitdi), sd(female_bitdi)), col="blue", lwd = 2)
 fig2 <- hist(male_bitdi, freq=F, breaks=20, col="powderblue", xlab = "Bitochanteric Diameter (cm)", main="Histogram of Male Bitrochanteric Diameter density \n with Normal Distribution overlay",)
 fig2 <- lines(normal_var, dnorm(normal_var, mean(male_bitdi), sd(male_bitdi)), col="blue", lwd = 2)
-figure <- ggarrange(fig1, fig2, nrow = 2, ncol = 1)
 ```
 
 ## Interpretation
